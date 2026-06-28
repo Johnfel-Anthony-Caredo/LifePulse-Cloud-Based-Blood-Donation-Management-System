@@ -107,4 +107,4 @@ docs/screenshots/              # Project screenshots and architecture diagram
 
 LifePulse was originally designed around an AWS Amplify cloud backend using Cognito authentication, AppSync GraphQL APIs, DynamoDB tables, Lambda workflows, optional S3 file storage, IAM permissions, and CloudWatch monitoring.
 
-The current public version keeps the AWS backend architecture and schema for showcase/reference while using local persisted demo data because the original AWS account/environment is no longer active.
+The current public version keeps the AWS backend architecture and schema for showcase/reference while using local persisted demo data because the original AWS account/environment is no longer active...
