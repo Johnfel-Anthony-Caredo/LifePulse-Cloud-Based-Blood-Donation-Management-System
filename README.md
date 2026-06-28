@@ -23,7 +23,7 @@ This project was developed as the final project for **IT312 - Integrative Progra
   <img src="docs/screenshots/Screenshot%202025-11-12%20205755.png" width="24%" />
 </p>
 
-### AWS Architecture
+### AWS Backend Architecture
 
 <p>
   <img src="docs/screenshots/AWS%20arch.png" width="100%" />
