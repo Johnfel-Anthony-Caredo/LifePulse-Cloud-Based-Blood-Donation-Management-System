@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "lifepulsenew",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authlifepulsenewe1551e30",
+      "Outputs.UserPoolId"
+    ]
+  }
+}

@@ -1,0 +1,755 @@
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type AdminUser @aws_cognito_user_pools {
+  createdAt: AWSDateTime!
+  email: AWSEmail!
+  hospital: Hospital
+  hospitalId: ID
+  id: ID!
+  name: String!
+  updatedAt: AWSDateTime!
+  userId: String!
+}
+
+type BloodRequest @aws_api_key @aws_cognito_user_pools {
+  bloodType: BloodType!
+  createdAt: AWSDateTime!
+  hospital: Hospital
+  hospitalId: ID!
+  id: ID!
+  notes: String
+  patientName: String!
+  status: RequestStatus!
+  unitsNeeded: Int!
+  updatedAt: AWSDateTime!
+  urgency: RequestUrgency!
+}
+
+type DonationHistory @aws_cognito_user_pools {
+  bloodType: BloodType!
+  createdAt: AWSDateTime!
+  donationDate: AWSDate!
+  donor: Donor
+  donorId: ID!
+  hospital: Hospital
+  hospitalId: ID!
+  id: ID!
+  notes: String
+  unitsGiven: Int!
+  updatedAt: AWSDateTime!
+}
+
+type Donor @aws_cognito_user_pools {
+  bloodType: BloodType!
+  createdAt: AWSDateTime!
+  donationHistory(donationDate: ModelStringKeyConditionInput, filter: ModelDonationHistoryFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelDonationHistoryConnection
+  email: AWSEmail!
+  id: ID!
+  isEligible: Boolean!
+  lastDonation: AWSDate
+  name: String!
+  notificationsEnabled: Boolean!
+  phone: String
+  radiusKm: Float
+  updatedAt: AWSDateTime!
+  userId: String!
+}
+
+type Hospital @aws_api_key @aws_cognito_user_pools {
+  address: String!
+  adminUsers(filter: ModelAdminUserFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelAdminUserConnection
+  bloodInventory: AWSJSON!
+  bloodRequests(createdAt: ModelStringKeyConditionInput, filter: ModelBloodRequestFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelBloodRequestConnection
+  createdAt: AWSDateTime!
+  donationHistory(donationDate: ModelStringKeyConditionInput, filter: ModelDonationHistoryFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelDonationHistoryConnection
+  email: String
+  id: ID!
+  lastUpdated: AWSDateTime!
+  latitude: Float!
+  longitude: Float!
+  name: String!
+  phone: String!
+  updatedAt: AWSDateTime!
+  urgency: HospitalUrgency!
+  urgencyColor: String!
+}
+
+type ModelAdminUserConnection @aws_api_key @aws_cognito_user_pools {
+  items: [AdminUser]!
+  nextToken: String
+}
+
+type ModelBloodRequestConnection @aws_api_key @aws_cognito_user_pools {
+  items: [BloodRequest]!
+  nextToken: String
+}
+
+type ModelDonationHistoryConnection @aws_api_key @aws_cognito_user_pools {
+  items: [DonationHistory]!
+  nextToken: String
+}
+
+type ModelDonorConnection @aws_cognito_user_pools {
+  items: [Donor]!
+  nextToken: String
+}
+
+type ModelHospitalConnection {
+  items: [Hospital]!
+  nextToken: String
+}
+
+type Mutation {
+  createAdminUser(condition: ModelAdminUserConditionInput, input: CreateAdminUserInput!): AdminUser @aws_cognito_user_pools
+  createBloodRequest(condition: ModelBloodRequestConditionInput, input: CreateBloodRequestInput!): BloodRequest @aws_cognito_user_pools
+  createDonationHistory(condition: ModelDonationHistoryConditionInput, input: CreateDonationHistoryInput!): DonationHistory @aws_cognito_user_pools
+  createDonor(condition: ModelDonorConditionInput, input: CreateDonorInput!): Donor
+  createHospital(condition: ModelHospitalConditionInput, input: CreateHospitalInput!): Hospital @aws_cognito_user_pools
+  deleteAdminUser(condition: ModelAdminUserConditionInput, input: DeleteAdminUserInput!): AdminUser @aws_cognito_user_pools
+  deleteBloodRequest(condition: ModelBloodRequestConditionInput, input: DeleteBloodRequestInput!): BloodRequest @aws_cognito_user_pools
+  deleteDonationHistory(condition: ModelDonationHistoryConditionInput, input: DeleteDonationHistoryInput!): DonationHistory @aws_cognito_user_pools
+  deleteDonor(condition: ModelDonorConditionInput, input: DeleteDonorInput!): Donor
+  deleteHospital(condition: ModelHospitalConditionInput, input: DeleteHospitalInput!): Hospital @aws_cognito_user_pools
+  updateAdminUser(condition: ModelAdminUserConditionInput, input: UpdateAdminUserInput!): AdminUser @aws_cognito_user_pools
+  updateBloodRequest(condition: ModelBloodRequestConditionInput, input: UpdateBloodRequestInput!): BloodRequest @aws_cognito_user_pools
+  updateDonationHistory(condition: ModelDonationHistoryConditionInput, input: UpdateDonationHistoryInput!): DonationHistory @aws_cognito_user_pools
+  updateDonor(condition: ModelDonorConditionInput, input: UpdateDonorInput!): Donor @aws_cognito_user_pools
+  updateHospital(condition: ModelHospitalConditionInput, input: UpdateHospitalInput!): Hospital @aws_cognito_user_pools
+}
+
+type Query {
+  adminByUserId(filter: ModelAdminUserFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection, userId: String!): ModelAdminUserConnection @aws_cognito_user_pools
+  adminUsersByHospitalId(filter: ModelAdminUserFilterInput, hospitalId: ID!, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelAdminUserConnection @aws_cognito_user_pools
+  bloodRequestsByHospitalIdAndCreatedAt(createdAt: ModelStringKeyConditionInput, filter: ModelBloodRequestFilterInput, hospitalId: ID!, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelBloodRequestConnection @aws_api_key @aws_cognito_user_pools
+  donationHistoriesByDonorIdAndDonationDate(donationDate: ModelStringKeyConditionInput, donorId: ID!, filter: ModelDonationHistoryFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelDonationHistoryConnection @aws_cognito_user_pools
+  donationHistoriesByHospitalIdAndDonationDate(donationDate: ModelStringKeyConditionInput, filter: ModelDonationHistoryFilterInput, hospitalId: ID!, limit: Int, nextToken: String, sortDirection: ModelSortDirection): ModelDonationHistoryConnection @aws_cognito_user_pools
+  donorByUserId(filter: ModelDonorFilterInput, limit: Int, nextToken: String, sortDirection: ModelSortDirection, userId: String!): ModelDonorConnection @aws_cognito_user_pools
+  getAdminUser(id: ID!): AdminUser @aws_cognito_user_pools
+  getBloodRequest(id: ID!): BloodRequest @aws_api_key @aws_cognito_user_pools
+  getDonationHistory(id: ID!): DonationHistory @aws_cognito_user_pools
+  getDonor(id: ID!): Donor @aws_cognito_user_pools
+  getHospital(id: ID!): Hospital
+  listAdminUsers(filter: ModelAdminUserFilterInput, limit: Int, nextToken: String): ModelAdminUserConnection @aws_cognito_user_pools
+  listBloodRequests(filter: ModelBloodRequestFilterInput, limit: Int, nextToken: String): ModelBloodRequestConnection @aws_api_key @aws_cognito_user_pools
+  listDonationHistories(filter: ModelDonationHistoryFilterInput, limit: Int, nextToken: String): ModelDonationHistoryConnection @aws_cognito_user_pools
+  listDonors(filter: ModelDonorFilterInput, limit: Int, nextToken: String): ModelDonorConnection @aws_cognito_user_pools
+  listHospitals(filter: ModelHospitalFilterInput, limit: Int, nextToken: String): ModelHospitalConnection
+}
+
+type Subscription {
+  onCreateAdminUser(filter: ModelSubscriptionAdminUserFilterInput): AdminUser @aws_cognito_user_pools @aws_subscribe(mutations : ["createAdminUser"])
+  onCreateBloodRequest(filter: ModelSubscriptionBloodRequestFilterInput): BloodRequest @aws_api_key @aws_cognito_user_pools @aws_subscribe(mutations : ["createBloodRequest"])
+  onCreateDonationHistory(donorId: String, filter: ModelSubscriptionDonationHistoryFilterInput): DonationHistory @aws_cognito_user_pools @aws_subscribe(mutations : ["createDonationHistory"])
+  onCreateDonor(filter: ModelSubscriptionDonorFilterInput, userId: String): Donor @aws_cognito_user_pools @aws_subscribe(mutations : ["createDonor"])
+  onCreateHospital(filter: ModelSubscriptionHospitalFilterInput): Hospital @aws_subscribe(mutations : ["createHospital"])
+  onDeleteAdminUser(filter: ModelSubscriptionAdminUserFilterInput): AdminUser @aws_cognito_user_pools @aws_subscribe(mutations : ["deleteAdminUser"])
+  onDeleteBloodRequest(filter: ModelSubscriptionBloodRequestFilterInput): BloodRequest @aws_api_key @aws_cognito_user_pools @aws_subscribe(mutations : ["deleteBloodRequest"])
+  onDeleteDonationHistory(donorId: String, filter: ModelSubscriptionDonationHistoryFilterInput): DonationHistory @aws_cognito_user_pools @aws_subscribe(mutations : ["deleteDonationHistory"])
+  onDeleteDonor(filter: ModelSubscriptionDonorFilterInput, userId: String): Donor @aws_cognito_user_pools @aws_subscribe(mutations : ["deleteDonor"])
+  onDeleteHospital(filter: ModelSubscriptionHospitalFilterInput): Hospital @aws_subscribe(mutations : ["deleteHospital"])
+  onUpdateAdminUser(filter: ModelSubscriptionAdminUserFilterInput): AdminUser @aws_cognito_user_pools @aws_subscribe(mutations : ["updateAdminUser"])
+  onUpdateBloodRequest(filter: ModelSubscriptionBloodRequestFilterInput): BloodRequest @aws_api_key @aws_cognito_user_pools @aws_subscribe(mutations : ["updateBloodRequest"])
+  onUpdateDonationHistory(donorId: String, filter: ModelSubscriptionDonationHistoryFilterInput): DonationHistory @aws_cognito_user_pools @aws_subscribe(mutations : ["updateDonationHistory"])
+  onUpdateDonor(filter: ModelSubscriptionDonorFilterInput, userId: String): Donor @aws_cognito_user_pools @aws_subscribe(mutations : ["updateDonor"])
+  onUpdateHospital(filter: ModelSubscriptionHospitalFilterInput): Hospital @aws_subscribe(mutations : ["updateHospital"])
+}
+
+enum BloodType {
+  AB_NEGATIVE
+  AB_POSITIVE
+  A_NEGATIVE
+  A_POSITIVE
+  B_NEGATIVE
+  B_POSITIVE
+  O_NEGATIVE
+  O_POSITIVE
+}
+
+enum HospitalUrgency {
+  CRITICAL
+  LOW
+  MEDIUM
+  WELL_STOCKED
+}
+
+enum ModelAttributeTypes {
+  _null
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+enum RequestStatus {
+  CANCELLED
+  COMPLETED
+  IN_PROGRESS
+  PENDING
+}
+
+enum RequestUrgency {
+  HIGH
+  LOW
+  MEDIUM
+}
+
+input CreateAdminUserInput {
+  createdAt: AWSDateTime
+  email: AWSEmail!
+  hospitalId: ID
+  id: ID
+  name: String!
+  updatedAt: AWSDateTime
+  userId: String!
+}
+
+input CreateBloodRequestInput {
+  bloodType: BloodType!
+  createdAt: AWSDateTime
+  hospitalId: ID!
+  id: ID
+  notes: String
+  patientName: String!
+  status: RequestStatus!
+  unitsNeeded: Int!
+  updatedAt: AWSDateTime
+  urgency: RequestUrgency!
+}
+
+input CreateDonationHistoryInput {
+  bloodType: BloodType!
+  createdAt: AWSDateTime
+  donationDate: AWSDate!
+  donorId: ID!
+  hospitalId: ID!
+  id: ID
+  notes: String
+  unitsGiven: Int!
+  updatedAt: AWSDateTime
+}
+
+input CreateDonorInput {
+  bloodType: BloodType!
+  createdAt: AWSDateTime
+  email: AWSEmail!
+  id: ID
+  isEligible: Boolean!
+  lastDonation: AWSDate
+  name: String!
+  notificationsEnabled: Boolean!
+  phone: String
+  radiusKm: Float
+  updatedAt: AWSDateTime
+  userId: String!
+}
+
+input CreateHospitalInput {
+  address: String!
+  bloodInventory: AWSJSON!
+  createdAt: AWSDateTime
+  email: String
+  id: ID
+  lastUpdated: AWSDateTime!
+  latitude: Float!
+  longitude: Float!
+  name: String!
+  phone: String!
+  updatedAt: AWSDateTime
+  urgency: HospitalUrgency!
+  urgencyColor: String!
+}
+
+input DeleteAdminUserInput {
+  id: ID!
+}
+
+input DeleteBloodRequestInput {
+  id: ID!
+}
+
+input DeleteDonationHistoryInput {
+  id: ID!
+}
+
+input DeleteDonorInput {
+  id: ID!
+}
+
+input DeleteHospitalInput {
+  id: ID!
+}
+
+input ModelAdminUserConditionInput {
+  and: [ModelAdminUserConditionInput]
+  createdAt: ModelStringInput
+  email: ModelStringInput
+  hospitalId: ModelIDInput
+  name: ModelStringInput
+  not: ModelAdminUserConditionInput
+  or: [ModelAdminUserConditionInput]
+  updatedAt: ModelStringInput
+  userId: ModelStringInput
+}
+
+input ModelAdminUserFilterInput {
+  and: [ModelAdminUserFilterInput]
+  createdAt: ModelStringInput
+  email: ModelStringInput
+  hospitalId: ModelIDInput
+  id: ModelIDInput
+  name: ModelStringInput
+  not: ModelAdminUserFilterInput
+  or: [ModelAdminUserFilterInput]
+  updatedAt: ModelStringInput
+  userId: ModelStringInput
+}
+
+input ModelBloodRequestConditionInput {
+  and: [ModelBloodRequestConditionInput]
+  bloodType: ModelBloodTypeInput
+  createdAt: ModelStringInput
+  hospitalId: ModelIDInput
+  not: ModelBloodRequestConditionInput
+  notes: ModelStringInput
+  or: [ModelBloodRequestConditionInput]
+  patientName: ModelStringInput
+  status: ModelRequestStatusInput
+  unitsNeeded: ModelIntInput
+  updatedAt: ModelStringInput
+  urgency: ModelRequestUrgencyInput
+}
+
+input ModelBloodRequestFilterInput {
+  and: [ModelBloodRequestFilterInput]
+  bloodType: ModelBloodTypeInput
+  createdAt: ModelStringInput
+  hospitalId: ModelIDInput
+  id: ModelIDInput
+  not: ModelBloodRequestFilterInput
+  notes: ModelStringInput
+  or: [ModelBloodRequestFilterInput]
+  patientName: ModelStringInput
+  status: ModelRequestStatusInput
+  unitsNeeded: ModelIntInput
+  updatedAt: ModelStringInput
+  urgency: ModelRequestUrgencyInput
+}
+
+input ModelBloodTypeInput {
+  eq: BloodType
+  ne: BloodType
+}
+
+input ModelBooleanInput {
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  eq: Boolean
+  ne: Boolean
+}
+
+input ModelDonationHistoryConditionInput {
+  and: [ModelDonationHistoryConditionInput]
+  bloodType: ModelBloodTypeInput
+  createdAt: ModelStringInput
+  donationDate: ModelStringInput
+  donorId: ModelIDInput
+  hospitalId: ModelIDInput
+  not: ModelDonationHistoryConditionInput
+  notes: ModelStringInput
+  or: [ModelDonationHistoryConditionInput]
+  unitsGiven: ModelIntInput
+  updatedAt: ModelStringInput
+}
+
+input ModelDonationHistoryFilterInput {
+  and: [ModelDonationHistoryFilterInput]
+  bloodType: ModelBloodTypeInput
+  createdAt: ModelStringInput
+  donationDate: ModelStringInput
+  donorId: ModelIDInput
+  hospitalId: ModelIDInput
+  id: ModelIDInput
+  not: ModelDonationHistoryFilterInput
+  notes: ModelStringInput
+  or: [ModelDonationHistoryFilterInput]
+  unitsGiven: ModelIntInput
+  updatedAt: ModelStringInput
+}
+
+input ModelDonorConditionInput {
+  and: [ModelDonorConditionInput]
+  bloodType: ModelBloodTypeInput
+  createdAt: ModelStringInput
+  email: ModelStringInput
+  isEligible: ModelBooleanInput
+  lastDonation: ModelStringInput
+  name: ModelStringInput
+  not: ModelDonorConditionInput
+  notificationsEnabled: ModelBooleanInput
+  or: [ModelDonorConditionInput]
+  phone: ModelStringInput
+  radiusKm: ModelFloatInput
+  updatedAt: ModelStringInput
+  userId: ModelStringInput
+}
+
+input ModelDonorFilterInput {
+  and: [ModelDonorFilterInput]
+  bloodType: ModelBloodTypeInput
+  createdAt: ModelStringInput
+  email: ModelStringInput
+  id: ModelIDInput
+  isEligible: ModelBooleanInput
+  lastDonation: ModelStringInput
+  name: ModelStringInput
+  not: ModelDonorFilterInput
+  notificationsEnabled: ModelBooleanInput
+  or: [ModelDonorFilterInput]
+  phone: ModelStringInput
+  radiusKm: ModelFloatInput
+  updatedAt: ModelStringInput
+  userId: ModelStringInput
+}
+
+input ModelFloatInput {
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  between: [Float]
+  eq: Float
+  ge: Float
+  gt: Float
+  le: Float
+  lt: Float
+  ne: Float
+}
+
+input ModelHospitalConditionInput {
+  address: ModelStringInput
+  and: [ModelHospitalConditionInput]
+  bloodInventory: ModelStringInput
+  createdAt: ModelStringInput
+  email: ModelStringInput
+  lastUpdated: ModelStringInput
+  latitude: ModelFloatInput
+  longitude: ModelFloatInput
+  name: ModelStringInput
+  not: ModelHospitalConditionInput
+  or: [ModelHospitalConditionInput]
+  phone: ModelStringInput
+  updatedAt: ModelStringInput
+  urgency: ModelHospitalUrgencyInput
+  urgencyColor: ModelStringInput
+}
+
+input ModelHospitalFilterInput {
+  address: ModelStringInput
+  and: [ModelHospitalFilterInput]
+  bloodInventory: ModelStringInput
+  createdAt: ModelStringInput
+  email: ModelStringInput
+  id: ModelIDInput
+  lastUpdated: ModelStringInput
+  latitude: ModelFloatInput
+  longitude: ModelFloatInput
+  name: ModelStringInput
+  not: ModelHospitalFilterInput
+  or: [ModelHospitalFilterInput]
+  phone: ModelStringInput
+  updatedAt: ModelStringInput
+  urgency: ModelHospitalUrgencyInput
+  urgencyColor: ModelStringInput
+}
+
+input ModelHospitalUrgencyInput {
+  eq: HospitalUrgency
+  ne: HospitalUrgency
+}
+
+input ModelIDInput {
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  between: [Int]
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+}
+
+input ModelRequestStatusInput {
+  eq: RequestStatus
+  ne: RequestStatus
+}
+
+input ModelRequestUrgencyInput {
+  eq: RequestUrgency
+  ne: RequestUrgency
+}
+
+input ModelSizeInput {
+  between: [Int]
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+}
+
+input ModelStringInput {
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+  size: ModelSizeInput
+}
+
+input ModelStringKeyConditionInput {
+  beginsWith: String
+  between: [String]
+  eq: String
+  ge: String
+  gt: String
+  le: String
+  lt: String
+}
+
+input ModelSubscriptionAdminUserFilterInput {
+  and: [ModelSubscriptionAdminUserFilterInput]
+  createdAt: ModelSubscriptionStringInput
+  email: ModelSubscriptionStringInput
+  hospitalId: ModelSubscriptionIDInput
+  id: ModelSubscriptionIDInput
+  name: ModelSubscriptionStringInput
+  or: [ModelSubscriptionAdminUserFilterInput]
+  updatedAt: ModelSubscriptionStringInput
+  userId: ModelSubscriptionStringInput
+}
+
+input ModelSubscriptionBloodRequestFilterInput {
+  and: [ModelSubscriptionBloodRequestFilterInput]
+  bloodType: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  hospitalId: ModelSubscriptionIDInput
+  id: ModelSubscriptionIDInput
+  notes: ModelSubscriptionStringInput
+  or: [ModelSubscriptionBloodRequestFilterInput]
+  patientName: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  unitsNeeded: ModelSubscriptionIntInput
+  updatedAt: ModelSubscriptionStringInput
+  urgency: ModelSubscriptionStringInput
+}
+
+input ModelSubscriptionBooleanInput {
+  eq: Boolean
+  ne: Boolean
+}
+
+input ModelSubscriptionDonationHistoryFilterInput {
+  and: [ModelSubscriptionDonationHistoryFilterInput]
+  bloodType: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  donationDate: ModelSubscriptionStringInput
+  donorId: ModelStringInput
+  hospitalId: ModelSubscriptionIDInput
+  id: ModelSubscriptionIDInput
+  notes: ModelSubscriptionStringInput
+  or: [ModelSubscriptionDonationHistoryFilterInput]
+  unitsGiven: ModelSubscriptionIntInput
+  updatedAt: ModelSubscriptionStringInput
+}
+
+input ModelSubscriptionDonorFilterInput {
+  and: [ModelSubscriptionDonorFilterInput]
+  bloodType: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  email: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  isEligible: ModelSubscriptionBooleanInput
+  lastDonation: ModelSubscriptionStringInput
+  name: ModelSubscriptionStringInput
+  notificationsEnabled: ModelSubscriptionBooleanInput
+  or: [ModelSubscriptionDonorFilterInput]
+  phone: ModelSubscriptionStringInput
+  radiusKm: ModelSubscriptionFloatInput
+  updatedAt: ModelSubscriptionStringInput
+  userId: ModelStringInput
+}
+
+input ModelSubscriptionFloatInput {
+  between: [Float]
+  eq: Float
+  ge: Float
+  gt: Float
+  in: [Float]
+  le: Float
+  lt: Float
+  ne: Float
+  notIn: [Float]
+}
+
+input ModelSubscriptionHospitalFilterInput {
+  address: ModelSubscriptionStringInput
+  and: [ModelSubscriptionHospitalFilterInput]
+  bloodInventory: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  email: ModelSubscriptionStringInput
+  id: ModelSubscriptionIDInput
+  lastUpdated: ModelSubscriptionStringInput
+  latitude: ModelSubscriptionFloatInput
+  longitude: ModelSubscriptionFloatInput
+  name: ModelSubscriptionStringInput
+  or: [ModelSubscriptionHospitalFilterInput]
+  phone: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  urgency: ModelSubscriptionStringInput
+  urgencyColor: ModelSubscriptionStringInput
+}
+
+input ModelSubscriptionIDInput {
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  in: [ID]
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+  notIn: [ID]
+}
+
+input ModelSubscriptionIntInput {
+  between: [Int]
+  eq: Int
+  ge: Int
+  gt: Int
+  in: [Int]
+  le: Int
+  lt: Int
+  ne: Int
+  notIn: [Int]
+}
+
+input ModelSubscriptionStringInput {
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  in: [String]
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+  notIn: [String]
+}
+
+input UpdateAdminUserInput {
+  createdAt: AWSDateTime
+  email: AWSEmail
+  hospitalId: ID
+  id: ID!
+  name: String
+  updatedAt: AWSDateTime
+  userId: String
+}
+
+input UpdateBloodRequestInput {
+  bloodType: BloodType
+  createdAt: AWSDateTime
+  hospitalId: ID
+  id: ID!
+  notes: String
+  patientName: String
+  status: RequestStatus
+  unitsNeeded: Int
+  updatedAt: AWSDateTime
+  urgency: RequestUrgency
+}
+
+input UpdateDonationHistoryInput {
+  bloodType: BloodType
+  createdAt: AWSDateTime
+  donationDate: AWSDate
+  donorId: ID
+  hospitalId: ID
+  id: ID!
+  notes: String
+  unitsGiven: Int
+  updatedAt: AWSDateTime
+}
+
+input UpdateDonorInput {
+  bloodType: BloodType
+  createdAt: AWSDateTime
+  email: AWSEmail
+  id: ID!
+  isEligible: Boolean
+  lastDonation: AWSDate
+  name: String
+  notificationsEnabled: Boolean
+  phone: String
+  radiusKm: Float
+  updatedAt: AWSDateTime
+  userId: String
+}
+
+input UpdateHospitalInput {
+  address: String
+  bloodInventory: AWSJSON
+  createdAt: AWSDateTime
+  email: String
+  id: ID!
+  lastUpdated: AWSDateTime
+  latitude: Float
+  longitude: Float
+  name: String
+  phone: String
+  updatedAt: AWSDateTime
+  urgency: HospitalUrgency
+  urgencyColor: String
+}

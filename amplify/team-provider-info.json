@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-lifepulsenew-dev-f66da-authRole",
+      "UnauthRoleArn": "arn:aws:iam::904233103979:role/amplify-lifepulsenew-dev-f66da-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::904233103979:role/amplify-lifepulsenew-dev-f66da-authRole",
+      "Region": "ap-southeast-2",
+      "DeploymentBucketName": "amplify-lifepulsenew-dev-f66da-deployment",
+      "UnauthRoleName": "amplify-lifepulsenew-dev-f66da-unauthRole",
+      "StackName": "amplify-lifepulsenew-dev-f66da",
+      "StackId": "arn:aws:cloudformation:ap-southeast-2:904233103979:stack/amplify-lifepulsenew-dev-f66da/5acfb960-cf0e-11f0-9b2d-0a7a3f34bb7b",
+      "AmplifyAppId": "d1xk69tfq6pq9m"
+    },
+    "categories": {
+      "auth": {
+        "lifepulsenewe1551e30": {}
+      },
+      "api": {
+        "lifepulsenew": {}
+      }
+    }
+  }
+}

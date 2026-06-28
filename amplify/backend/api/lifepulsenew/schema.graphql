@@ -1,0 +1,228 @@
+# Blood Donation Management System Schema
+
+# Enums
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+}
+
+enum HospitalUrgency {
+  CRITICAL
+  LOW
+  MEDIUM
+  WELL_STOCKED
+}
+
+enum RequestStatus {
+  PENDING
+  FULFILLED
+  CANCELLED
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum NotificationType {
+  BLOOD_REQUEST
+  APPOINTMENT_REMINDER
+  ELIGIBILITY_RESTORED
+  CAMPAIGN
+  SYSTEM
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+# Hospital Type
+type Hospital 
+  @model
+  @auth(rules: [
+    { allow: public, operations: [read], provider: apiKey },
+    { allow: private, operations: [read, create, update, delete] }
+  ])
+{
+  id: ID!
+  name: String!
+  latitude: Float!
+  longitude: Float!
+  address: String!
+  phone: String!
+  email: String
+  imageUrl: AWSURL
+  is24Hours: Boolean!
+  operatingHours: String
+  urgency: HospitalUrgency!
+  urgencyColor: String!
+  bloodInventory: AWSJSON!
+  lastUpdated: AWSDateTime
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Donor User Type
+type Donor
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "userId" },
+    { allow: private, operations: [read, create, update, delete] }
+  ])
+{
+  id: ID!
+  userId: String! @index(name: "byUserId", queryField: "donorByUserId")
+  name: String!
+  email: AWSEmail!
+  phone: String
+  bloodType: BloodType!
+  lastDonation: AWSDate
+  isEligible: Boolean!
+  notificationsEnabled: Boolean!
+  radiusKm: Float
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Admin User Type  
+type AdminUser
+  @model
+  @auth(rules: [
+    { allow: private, operations: [read, create, update, delete] }
+  ])
+{
+  id: ID!
+  userId: String! @index(name: "byUserId", queryField: "adminByUserId")
+  name: String!
+  email: AWSEmail!
+  hospitalId: ID
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Donation History Type
+type DonationHistory
+  @model
+  @auth(rules: [
+    { allow: private, operations: [read, create, update, delete] }
+  ])
+{
+  id: ID!
+  donorId: ID! @index(name: "byDonor", sortKeyFields: ["donationDate"])
+  hospitalId: ID! @index(name: "byHospital", sortKeyFields: ["donationDate"])
+  donationDate: AWSDate!
+  bloodType: BloodType!
+  unitsGiven: Int!
+  notes: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Blood Request Type
+type BloodRequest
+  @model
+  @auth(rules: [
+    { allow: public, operations: [read], provider: apiKey },
+    { allow: private, operations: [read, create, update, delete] }
+  ])
+{
+  id: ID!
+  hospitalId: ID! @index(name: "byHospital", sortKeyFields: ["createdAt"])
+  bloodType: BloodType!
+  unitsNeeded: Int!
+  urgency: HospitalUrgency!
+  patientName: String!
+  contactPerson: String
+  contactPhone: String
+  status: RequestStatus!
+  notes: String
+  expiresAt: AWSDateTime
+  fulfilledAt: AWSDateTime
+  createdBy: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Appointment Type
+type Appointment
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "donorId" },
+    { allow: private, operations: [read, create, update, delete] }
+  ])
+{
+  id: ID!
+  donorId: ID! @index(name: "byDonor", sortKeyFields: ["appointmentDate"])
+  hospitalId: ID! @index(name: "byHospital", sortKeyFields: ["appointmentDate"])
+  bloodRequestId: ID @index(name: "byBloodRequest")
+  appointmentDate: AWSDateTime!
+  bloodType: BloodType!
+  status: AppointmentStatus!
+  notes: String
+  reminderSent: Boolean!
+  confirmedAt: AWSDateTime
+  completedAt: AWSDateTime
+  cancelledAt: AWSDateTime
+  cancellationReason: String
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Notification Type
+type Notification
+  @model
+  @auth(rules: [
+    { allow: owner, ownerField: "userId" },
+    { allow: private, operations: [read, create, update, delete] }
+  ])
+{
+  id: ID!
+  userId: String! @index(name: "byUser", sortKeyFields: ["createdAt"])
+  type: NotificationType!
+  priority: NotificationPriority!
+  title: String!
+  message: String!
+  isRead: Boolean!
+  readAt: AWSDateTime
+  actionUrl: String
+  metadata: AWSJSON
+  expiresAt: AWSDateTime
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+# Campaign Type
+type Campaign
+  @model
+  @auth(rules: [
+    { allow: public, operations: [read], provider: apiKey },
+    { allow: private, operations: [read, create, update, delete] }
+  ])
+{
+  id: ID!
+  title: String!
+  description: String!
+  imageUrl: AWSURL
+  bloodType: BloodType
+  targetUnits: Int!
+  currentUnits: Int!
+  startDate: AWSDate!
+  endDate: AWSDate!
+  isActive: Boolean!
+  hospitalId: ID @index(name: "byHospital")
+  createdBy: String!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
