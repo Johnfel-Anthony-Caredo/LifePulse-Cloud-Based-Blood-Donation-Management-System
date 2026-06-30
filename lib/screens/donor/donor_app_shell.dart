@@ -30,6 +30,15 @@ enum DonorMapStyle {
   terrain,
 }
 
+const _donorInk = Color(0xFF22050B);
+const _donorDeepRed = Color(0xFF7A001D);
+const _donorCrimson = Color(0xFFE11D48);
+const _donorRose = Color(0xFFFFEEF1);
+const _donorSurface = Color(0xFFFFFBFB);
+const _donorBorder = Color(0xFFFFCED8);
+const _donorMuted = Color(0xFF754352);
+const _donorBlue = Color(0xFF2563EB);
+
 class DonorAppShell extends StatefulWidget {
   const DonorAppShell({super.key});
 
@@ -119,20 +128,49 @@ class _DonorAppShellState extends State<DonorAppShell> {
 
     return Theme(
       data: Theme.of(context).copyWith(
-        scaffoldBackgroundColor: const Color(0xFFFFF7F7),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: primaryColor,
+        scaffoldBackgroundColor: _donorRose,
+        colorScheme: const ColorScheme.light(
           primary: primaryColor,
+          onPrimary: Colors.white,
           secondary: tealAccent,
           surface: Colors.white,
+          onSurface: _donorInk,
+          error: primaryColor,
         ),
+        textTheme: Theme.of(context).textTheme.apply(
+              bodyColor: _donorInk,
+              displayColor: _donorInk,
+            ),
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: Colors.red.shade50),
+            side: const BorderSide(color: _donorBorder),
           ),
+        ),
+        chipTheme: Theme.of(context).chipTheme.copyWith(
+              selectedColor: primaryColor,
+              backgroundColor: Colors.white,
+              side: const BorderSide(color: _donorBorder),
+              labelStyle: const TextStyle(fontWeight: FontWeight.w800),
+            ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: _donorBorder),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: _donorBorder),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: primaryColor, width: 1.5),
+          ),
+          labelStyle: const TextStyle(color: _donorMuted),
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
@@ -143,10 +181,34 @@ class _DonorAppShellState extends State<DonorAppShell> {
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
           ),
         ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: primaryColor,
+            side: const BorderSide(color: _donorBorder),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          ),
+        ),
       ),
       child: Scaffold(
-        body: SafeArea(
-          child: isWide ? _buildWideShell() : _buildMobileShell(),
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFFFF6F7),
+                Color(0xFFFFECEF),
+                Color(0xFFFFFDFD),
+              ],
+            ),
+          ),
+          child: SafeArea(
+            top: _selectedIndex != 1,
+            bottom: false,
+            child: isWide ? _buildWideShell() : _buildMobileShell(),
+          ),
         ),
         bottomNavigationBar: isWide ? null : _buildBottomTabs(),
       ),
@@ -160,15 +222,16 @@ class _DonorAppShellState extends State<DonorAppShell> {
         Expanded(
           child: Column(
             children: [
-              _DonorTopBar(
-                title: _destinations[_selectedIndex].label,
-                subtitle: _topBarSubtitle,
-                donor: _donor,
-                unreadCount: _unreadNotifications.length,
-                onInbox: () => setState(() => _selectedIndex = 3),
-                onRefresh: _loadDonorApp,
-                onLogout: _logout,
-              ),
+              if (_selectedIndex != 1)
+                _DonorTopBar(
+                  title: _destinations[_selectedIndex].label,
+                  subtitle: _topBarSubtitle,
+                  donor: _donor,
+                  unreadCount: _unreadNotifications.length,
+                  onInbox: () => setState(() => _selectedIndex = 3),
+                  onRefresh: _loadDonorApp,
+                  onLogout: _logout,
+                ),
               Expanded(child: _buildCurrentSection()),
             ],
           ),
@@ -180,16 +243,17 @@ class _DonorAppShellState extends State<DonorAppShell> {
   Widget _buildMobileShell() {
     return Column(
       children: [
-        _DonorTopBar(
-          title: _destinations[_selectedIndex].label,
-          subtitle: _topBarSubtitle,
-          donor: _donor,
-          unreadCount: _unreadNotifications.length,
-          onInbox: () => setState(() => _selectedIndex = 3),
-          onRefresh: _loadDonorApp,
-          onLogout: _logout,
-          compact: true,
-        ),
+        if (_selectedIndex != 1)
+          _DonorTopBar(
+            title: _destinations[_selectedIndex].label,
+            subtitle: _topBarSubtitle,
+            donor: _donor,
+            unreadCount: _unreadNotifications.length,
+            onInbox: () => setState(() => _selectedIndex = 3),
+            onRefresh: _loadDonorApp,
+            onLogout: _logout,
+            compact: true,
+          ),
         Expanded(child: _buildCurrentSection()),
       ],
     );
@@ -200,8 +264,12 @@ class _DonorAppShellState extends State<DonorAppShell> {
       width: 244,
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(right: BorderSide(color: Color(0xFFFFE4E4))),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [_donorDeepRed, Color(0xFF4D0012)],
+        ),
+        border: Border(right: BorderSide(color: Color(0x33FFFFFF))),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,16 +280,20 @@ class _DonorAppShellState extends State<DonorAppShell> {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: primaryColor,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.bloodtype_rounded, color: Colors.white),
+                child: const Icon(Icons.bloodtype_rounded, color: primaryColor),
               ),
               const SizedBox(width: 12),
               const Expanded(
                 child: Text(
                   'Dugo Donor',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
             ],
@@ -239,14 +311,23 @@ class _DonorAppShellState extends State<DonorAppShell> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isSelected ? lightRedColor : Colors.transparent,
+                    color: isSelected
+                        ? Colors.white
+                        : Colors.white.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: isSelected
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.10),
+                    ),
                   ),
                   child: Row(
                     children: [
                       Icon(
                         destination.icon,
-                        color: isSelected ? primaryColor : grayColor,
+                        color: isSelected
+                            ? primaryColor
+                            : Colors.white.withValues(alpha: 0.82),
                       ),
                       const SizedBox(width: 12),
                       Text(
@@ -254,9 +335,9 @@ class _DonorAppShellState extends State<DonorAppShell> {
                         style: TextStyle(
                           color: isSelected
                               ? primaryColor
-                              : const Color(0xFF1F2937),
+                              : Colors.white.withValues(alpha: 0.88),
                           fontWeight:
-                              isSelected ? FontWeight.w800 : FontWeight.w600,
+                              isSelected ? FontWeight.w900 : FontWeight.w700,
                         ),
                       ),
                     ],
@@ -280,7 +361,14 @@ class _DonorAppShellState extends State<DonorAppShell> {
         padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
         decoration: const BoxDecoration(
           color: Colors.white,
-          border: Border(top: BorderSide(color: Color(0xFFFFE4E4))),
+          border: Border(top: BorderSide(color: _donorBorder)),
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x1A7A001D),
+              blurRadius: 20,
+              offset: Offset(0, -8),
+            ),
+          ],
         ),
         child: Row(
           children: List.generate(_destinations.length, (index) {
@@ -300,13 +388,13 @@ class _DonorAppShellState extends State<DonorAppShell> {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected ? lightRedColor : Colors.transparent,
+                        color: isSelected ? primaryColor : Colors.transparent,
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Icon(
                         destination.icon,
                         size: 21,
-                        color: isSelected ? primaryColor : grayColor,
+                        color: isSelected ? Colors.white : _donorMuted,
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -497,66 +585,101 @@ class _DonorAppShellState extends State<DonorAppShell> {
   }
 
   Widget _buildMapSection() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
-          child: _buildMapControls(),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Stack(
+    final topInset = MediaQuery.of(context).padding.top;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isCompact = constraints.maxWidth < 720;
+
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: FlutterMap(
+                mapController: _mapController,
+                options: MapOptions(
+                  initialCenter: const LatLng(7.4479, 125.8078),
+                  initialZoom: isCompact ? 8.2 : 8.8,
+                  minZoom: 5,
+                  maxZoom: 18,
+                  onTap: (_, __) => setState(() => _selectedHospital = null),
+                ),
                 children: [
-                  FlutterMap(
-                    mapController: _mapController,
-                    options: MapOptions(
-                      initialCenter: const LatLng(7.4479, 125.8078),
-                      initialZoom: 8.5,
-                      minZoom: 5,
-                      maxZoom: 18,
-                      onTap: (_, __) =>
-                          setState(() => _selectedHospital = null),
-                    ),
-                    children: [
-                      TileLayer(
-                        urlTemplate: _tileUrl,
-                        subdomains: _tileSubdomains,
-                        userAgentPackageName: 'com.example.dugo',
-                        maxZoom: 19,
-                      ),
-                      MarkerLayer(
-                        markers:
-                            _filteredHospitals.map(_hospitalMarker).toList(),
-                      ),
-                    ],
+                  TileLayer(
+                    urlTemplate: _tileUrl,
+                    subdomains: _tileSubdomains,
+                    userAgentPackageName: 'com.example.dugo',
+                    maxZoom: 19,
                   ),
-                  Positioned(
-                    right: 12,
-                    top: 12,
-                    child: _MapZoomControls(
-                      onZoomIn: () => _mapController.move(
-                        _mapController.camera.center,
-                        _mapController.camera.zoom + 1,
-                      ),
-                      onZoomOut: () => _mapController.move(
-                        _mapController.camera.center,
-                        _mapController.camera.zoom - 1,
-                      ),
+                  MarkerLayer(
+                    markers: _filteredHospitals.map(_hospitalMarker).toList(),
+                  ),
+                ],
+              ),
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        _donorDeepRed.withValues(alpha: 0.16),
+                        Colors.transparent,
+                        _donorDeepRed.withValues(alpha: 0.12),
+                      ],
+                      stops: const [0, 0.42, 1],
                     ),
                   ),
-                  Positioned(
-                    left: 12,
-                    bottom: 12,
-                    child: _MapLegend(),
-                  ),
-                  if (_selectedHospital != null)
-                    Positioned(
-                      left: 12,
-                      right: 12,
-                      bottom: 12,
+                ),
+              ),
+            ),
+            Positioned(
+              top: topInset + 12,
+              left: isCompact ? 12 : 18,
+              right: isCompact ? 12 : null,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: isCompact ? double.infinity : 690,
+                ),
+                child: _buildMapControls(compact: isCompact),
+              ),
+            ),
+            Positioned(
+              right: isCompact ? 12 : 18,
+              bottom: isCompact && _selectedHospital != null
+                  ? constraints.maxHeight * 0.48 + 28
+                  : isCompact
+                      ? 18
+                      : 24,
+              child: _MapZoomControls(
+                onZoomIn: () => _mapController.move(
+                  _mapController.camera.center,
+                  (_mapController.camera.zoom + 1).clamp(5.0, 18.0),
+                ),
+                onZoomOut: () => _mapController.move(
+                  _mapController.camera.center,
+                  (_mapController.camera.zoom - 1).clamp(5.0, 18.0),
+                ),
+              ),
+            ),
+            if (!isCompact)
+              Positioned(
+                left: 18,
+                bottom: 24,
+                child: _MapLegend(),
+              ),
+            if (_selectedHospital != null)
+              if (isCompact)
+                Positioned(
+                  left: 12,
+                  right: 12,
+                  bottom: 16,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: constraints.maxHeight * 0.48,
+                    ),
+                    child: SingleChildScrollView(
                       child: _HospitalDetailPanel(
                         hospital: _selectedHospital!,
                         donorBloodType: _donor?.bloodTypeDisplay,
@@ -564,12 +687,23 @@ class _DonorAppShellState extends State<DonorAppShell> {
                         onBook: () => _openBooking(_selectedHospital!),
                       ),
                     ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
+                  ),
+                )
+              else
+                Positioned(
+                  top: topInset + 112,
+                  right: 18,
+                  width: 400,
+                  child: _HospitalDetailPanel(
+                    hospital: _selectedHospital!,
+                    donorBloodType: _donor?.bloodTypeDisplay,
+                    onClose: () => setState(() => _selectedHospital = null),
+                    onBook: () => _openBooking(_selectedHospital!),
+                  ),
+                ),
+          ],
+        );
+      },
     );
   }
 
@@ -812,86 +946,171 @@ class _DonorAppShellState extends State<DonorAppShell> {
     );
   }
 
-  Widget _buildMapControls() {
-    return _DonorCard(
-      padding: const EdgeInsets.all(12),
-      child: Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        crossAxisAlignment: WrapCrossAlignment.center,
+  Widget _buildMapControls({required bool compact}) {
+    final controls = [
+      SizedBox(
+        width: compact ? 168 : 186,
+        child: DropdownButtonFormField<DonorMapStyle>(
+          initialValue: _mapStyle,
+          isExpanded: true,
+          decoration: const InputDecoration(
+            labelText: 'Map style',
+            isDense: true,
+          ),
+          items: DonorMapStyle.values
+              .map(
+                (style) => DropdownMenuItem(
+                  value: style,
+                  child: Text(_mapStyleLabel(style)),
+                ),
+              )
+              .toList(),
+          onChanged: (value) => setState(() => _mapStyle = value ?? _mapStyle),
+        ),
+      ),
+      SizedBox(
+        width: compact ? 156 : 170,
+        child: DropdownButtonFormField<HospitalUrgency>(
+          initialValue: _urgencyFilter,
+          isExpanded: true,
+          decoration: const InputDecoration(
+            labelText: 'Urgency',
+            isDense: true,
+          ),
+          items: const [
+            DropdownMenuItem(value: null, child: Text('All urgency')),
+            DropdownMenuItem(
+                value: HospitalUrgency.critical, child: Text('Critical')),
+            DropdownMenuItem(
+                value: HospitalUrgency.low, child: Text('Low stock')),
+            DropdownMenuItem(
+                value: HospitalUrgency.medium, child: Text('Medium')),
+            DropdownMenuItem(
+                value: HospitalUrgency.good, child: Text('Well stocked')),
+          ],
+          onChanged: (value) => setState(() => _urgencyFilter = value),
+        ),
+      ),
+      SizedBox(
+        width: compact ? 136 : 150,
+        child: DropdownButtonFormField<String>(
+          initialValue: _bloodTypeFilter,
+          isExpanded: true,
+          decoration: const InputDecoration(
+            labelText: 'Blood type',
+            isDense: true,
+          ),
+          items: const [
+            DropdownMenuItem(value: null, child: Text('All types')),
+            DropdownMenuItem(value: 'A+', child: Text('A+')),
+            DropdownMenuItem(value: 'A-', child: Text('A-')),
+            DropdownMenuItem(value: 'B+', child: Text('B+')),
+            DropdownMenuItem(value: 'B-', child: Text('B-')),
+            DropdownMenuItem(value: 'O+', child: Text('O+')),
+            DropdownMenuItem(value: 'O-', child: Text('O-')),
+            DropdownMenuItem(value: 'AB+', child: Text('AB+')),
+            DropdownMenuItem(value: 'AB-', child: Text('AB-')),
+          ],
+          onChanged: (value) => setState(() => _bloodTypeFilter = value),
+        ),
+      ),
+    ];
+
+    return Container(
+      padding: EdgeInsets.all(compact ? 12 : 14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.72)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33000000),
+            blurRadius: 24,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 190,
-            child: DropdownButtonFormField<DonorMapStyle>(
-              initialValue: _mapStyle,
-              decoration: const InputDecoration(
-                labelText: 'Map style',
-                border: OutlineInputBorder(),
-                isDense: true,
+          Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [_donorCrimson, _donorDeepRed],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.map_rounded,
+                    color: Colors.white, size: 21),
               ),
-              items: DonorMapStyle.values
-                  .map(
-                    (style) => DropdownMenuItem(
-                      value: style,
-                      child: Text(_mapStyleLabel(style)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'LifePulse Map',
+                      style: TextStyle(
+                        color: _donorInk,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
-                  )
-                  .toList(),
-              onChanged: (value) =>
-                  setState(() => _mapStyle = value ?? _mapStyle),
-            ),
-          ),
-          SizedBox(
-            width: 170,
-            child: DropdownButtonFormField<HospitalUrgency>(
-              initialValue: _urgencyFilter,
-              decoration: const InputDecoration(
-                labelText: 'Urgency',
-                border: OutlineInputBorder(),
-                isDense: true,
+                    Text(
+                      '${_filteredHospitals.length} hospitals matched',
+                      style: const TextStyle(
+                        color: _donorMuted,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              items: const [
-                DropdownMenuItem(value: null, child: Text('All urgency')),
-                DropdownMenuItem(
-                    value: HospitalUrgency.critical, child: Text('Critical')),
-                DropdownMenuItem(
-                    value: HospitalUrgency.low, child: Text('Low stock')),
-                DropdownMenuItem(
-                    value: HospitalUrgency.medium, child: Text('Medium')),
-                DropdownMenuItem(
-                    value: HospitalUrgency.good, child: Text('Well stocked')),
-              ],
-              onChanged: (value) => setState(() => _urgencyFilter = value),
-            ),
-          ),
-          SizedBox(
-            width: 150,
-            child: DropdownButtonFormField<String>(
-              initialValue: _bloodTypeFilter,
-              decoration: const InputDecoration(
-                labelText: 'Blood type',
-                border: OutlineInputBorder(),
-                isDense: true,
+              _StatusChip(
+                label: _donor?.bloodTypeDisplay ?? 'All blood',
+                color: primaryColor,
+                soft: true,
               ),
-              items: const [
-                DropdownMenuItem(value: null, child: Text('All types')),
-                DropdownMenuItem(value: 'A+', child: Text('A+')),
-                DropdownMenuItem(value: 'A-', child: Text('A-')),
-                DropdownMenuItem(value: 'B+', child: Text('B+')),
-                DropdownMenuItem(value: 'B-', child: Text('B-')),
-                DropdownMenuItem(value: 'O+', child: Text('O+')),
-                DropdownMenuItem(value: 'O-', child: Text('O-')),
-                DropdownMenuItem(value: 'AB+', child: Text('AB+')),
-                DropdownMenuItem(value: 'AB-', child: Text('AB-')),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (compact)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final control in controls) ...[
+                    control,
+                    const SizedBox(width: 10),
+                  ],
+                  _MiniLegendRow(),
+                ],
+              ),
+            )
+          else
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                ...controls,
+                _StatusChip(
+                  label: _urgencyFilter == null
+                      ? 'All urgency'
+                      : _urgencyFilterLabel(_urgencyFilter!),
+                  color: _urgencyFilter == null
+                      ? primaryColor
+                      : _urgencyColor(_urgencyFilter!),
+                  soft: true,
+                ),
               ],
-              onChanged: (value) => setState(() => _bloodTypeFilter = value),
             ),
-          ),
-          _StatusChip(
-            label: '${_filteredHospitals.length} hospitals',
-            color: primaryColor,
-            soft: true,
-          ),
         ],
       ),
     );
@@ -1258,30 +1477,75 @@ class _DonorAppShellState extends State<DonorAppShell> {
     final isSelected = _selectedHospital?.id == hospital.id;
     return Marker(
       point: LatLng(hospital.latitude, hospital.longitude),
-      width: isSelected ? 58 : 48,
-      height: isSelected ? 58 : 48,
+      width: isSelected ? 66 : 56,
+      height: isSelected ? 66 : 56,
       child: GestureDetector(
         onTap: () {
           setState(() => _selectedHospital = hospital);
           _mapController.move(
-              LatLng(hospital.latitude, hospital.longitude), 12);
+              LatLng(hospital.latitude, hospital.longitude),
+              _mapController.camera.zoom < 12
+                  ? 12
+                  : _mapController.camera.zoom);
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: isSelected ? 4 : 3),
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.35),
-                blurRadius: isSelected ? 18 : 10,
-                spreadRadius: isSelected ? 5 : 1,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              if (hospital.urgency == HospitalUrgency.critical)
+                Container(
+                  width: isSelected ? 64 : 54,
+                  height: isSelected ? 64 : 54,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: primaryColor.withValues(alpha: 0.30),
+                      width: 8,
+                    ),
+                  ),
+                ),
+              Container(
+                width: isSelected ? 52 : 44,
+                height: isSelected ? 52 : 44,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.40),
+                      blurRadius: isSelected ? 22 : 14,
+                      spreadRadius: isSelected ? 4 : 1,
+                    ),
+                  ],
+                ),
               ),
+              Container(
+                width: isSelected ? 40 : 34,
+                height: isSelected ? 40 : 34,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [color, Color.lerp(color, _donorDeepRed, 0.34)!],
+                  ),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: Icon(
+                  Icons.bloodtype_rounded,
+                  color: Colors.white,
+                  size: isSelected ? 23 : 19,
+                ),
+              ),
+              if (isSelected)
+                const Positioned(
+                  right: 4,
+                  top: 4,
+                  child: _MapSelectedBadge(),
+                ),
             ],
           ),
-          child: const Icon(Icons.local_hospital_rounded,
-              color: Colors.white, size: 23),
         ),
       ),
     );
@@ -1524,6 +1788,19 @@ class _DonorAppShellState extends State<DonorAppShell> {
     }
   }
 
+  static String _urgencyFilterLabel(HospitalUrgency urgency) {
+    switch (urgency) {
+      case HospitalUrgency.critical:
+        return 'Critical';
+      case HospitalUrgency.low:
+        return 'Low stock';
+      case HospitalUrgency.medium:
+        return 'Medium';
+      case HospitalUrgency.good:
+        return 'Well stocked';
+    }
+  }
+
   static Color _urgencyColor(HospitalUrgency urgency) {
     switch (urgency) {
       case HospitalUrgency.critical:
@@ -1603,7 +1880,14 @@ class _DonorTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(16, compact ? 10 : 16, 16, compact ? 8 : 14),
-      color: Colors.white,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [Colors.white, Color(0xFFFFF1F3)],
+        ),
+        border: Border(bottom: BorderSide(color: _donorBorder)),
+      ),
       child: Row(
         children: [
           Expanded(
@@ -1615,11 +1899,17 @@ class _DonorTopBar extends StatelessWidget {
                   style: TextStyle(
                     fontSize: compact ? 22 : 26,
                     fontWeight: FontWeight.w900,
-                    color: const Color(0xFF111827),
+                    color: _donorInk,
                   ),
                 ),
                 const SizedBox(height: 3),
-                Text(subtitle, style: const TextStyle(color: grayColor)),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: _donorMuted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
           ),
@@ -1629,6 +1919,10 @@ class _DonorTopBar extends StatelessWidget {
               IconButton(
                 tooltip: 'Notifications',
                 onPressed: onInbox,
+                style: IconButton.styleFrom(
+                  backgroundColor: _donorRose,
+                  foregroundColor: _donorDeepRed,
+                ),
                 icon: const Icon(Icons.notifications_rounded),
               ),
               if (unreadCount > 0)
@@ -1653,6 +1947,10 @@ class _DonorTopBar extends StatelessWidget {
           IconButton(
             tooltip: 'Refresh',
             onPressed: onRefresh,
+            style: IconButton.styleFrom(
+              backgroundColor: _donorRose,
+              foregroundColor: _donorDeepRed,
+            ),
             icon: const Icon(Icons.refresh_rounded),
           ),
           PopupMenuButton<String>(
@@ -1664,11 +1962,11 @@ class _DonorTopBar extends StatelessWidget {
               PopupMenuItem(value: 'logout', child: Text('Sign out')),
             ],
             child: CircleAvatar(
-              backgroundColor: lightRedColor,
+              backgroundColor: primaryColor,
               child: Text(
                 donor?.bloodTypeDisplay ?? 'D',
                 style: const TextStyle(
-                    color: primaryColor, fontWeight: FontWeight.w900),
+                    color: Colors.white, fontWeight: FontWeight.w900),
               ),
             ),
           ),
@@ -1900,14 +2198,21 @@ class _PageIntroCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white,
+            color.withValues(alpha: 0.07),
+          ],
+        ),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.18)),
+        border: Border.all(color: color.withValues(alpha: 0.22)),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 12,
-            offset: Offset(0, 4),
+            color: Color(0x147A001D),
+            blurRadius: 18,
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -2101,14 +2406,14 @@ class _DonorCard extends StatelessWidget {
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _donorSurface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFFFE4E4)),
+        border: Border.all(color: _donorBorder),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 12,
-            offset: Offset(0, 4),
+            color: Color(0x147A001D),
+            blurRadius: 18,
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -2332,7 +2637,7 @@ class _QuickActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: action.color.withValues(alpha: 0.08),
+      color: Colors.transparent,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
@@ -2340,8 +2645,16 @@ class _QuickActionTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                action.color.withValues(alpha: 0.13),
+                action.color.withValues(alpha: 0.05),
+              ],
+            ),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: action.color.withValues(alpha: 0.20)),
+            border: Border.all(color: action.color.withValues(alpha: 0.24)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2512,59 +2825,228 @@ class _HospitalDetailPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final units =
         donorBloodType == null ? null : hospital.bloodInventory[donorBloodType];
+    final urgencyColor = _DonorAppShellState._urgencyColor(hospital.urgency);
+    final criticalTypes = hospital.criticalBloodTypes.take(5).join(', ');
+
     return _DonorCard(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.zero,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  hospital.name,
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [_donorDeepRed, primaryColor],
+              ),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.16),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.local_hospital_rounded,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 11),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        hospital.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          height: 1.15,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        hospital.address,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFFFFDDE4),
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: onClose,
+                  icon: const Icon(Icons.close_rounded),
+                  color: Colors.white,
+                  tooltip: 'Close',
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _StatusChip(
+                      label: hospital.urgencyLabel,
+                      color: urgencyColor,
+                    ),
+                    if (donorBloodType != null)
+                      _StatusChip(
+                        label: '$donorBloodType: ${units ?? 0} units',
+                        color: (units ?? 0) <= 5 ? primaryColor : orangeAccent,
+                        soft: true,
+                      ),
+                    _StatusChip(
+                      label: hospital.is24Hours
+                          ? 'Open 24 hours'
+                          : (hospital.operatingHours ?? 'Check hours'),
+                      color: tealAccent,
+                      soft: true,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _MapDetailFact(
+                        label: 'Blood units',
+                        value: '${hospital.totalUnits}',
+                        icon: Icons.inventory_2_rounded,
+                        color: primaryColor,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _MapDetailFact(
+                        label: 'Call hospital',
+                        value: hospital.phone,
+                        icon: Icons.phone_rounded,
+                        color: _donorBlue,
+                      ),
+                    ),
+                  ],
+                ),
+                if (criticalTypes.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: primaryColor.withValues(alpha: 0.18),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.priority_high_rounded,
+                          color: primaryColor,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Critical blood types: $criticalTypes',
+                            style: const TextStyle(
+                              color: _donorInk,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: onBook,
+                    icon: const Icon(Icons.event_available_rounded),
+                    label: const Text('Book donation appointment'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MapDetailFact extends StatelessWidget {
+  const _MapDetailFact({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.16)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
                   style: const TextStyle(
-                      fontSize: 17, fontWeight: FontWeight.w900),
+                    color: _donorMuted,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              IconButton(
-                onPressed: onClose,
-                icon: const Icon(Icons.close_rounded),
-                tooltip: 'Close',
-              ),
-            ],
-          ),
-          Text(hospital.address, style: const TextStyle(color: grayColor)),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _StatusChip(
-                label: hospital.urgencyLabel,
-                color: _DonorAppShellState._urgencyColor(hospital.urgency),
-              ),
-              if (donorBloodType != null)
-                _StatusChip(
-                  label: '$donorBloodType: ${units ?? 0} units',
-                  color: (units ?? 0) <= 5 ? primaryColor : orangeAccent,
-                  soft: true,
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: _donorInk,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
-              _StatusChip(
-                label: hospital.is24Hours
-                    ? 'Open 24 hours'
-                    : (hospital.operatingHours ?? 'Check hours'),
-                color: tealAccent,
-                soft: true,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          FilledButton.icon(
-            onPressed: onBook,
-            icon: const Icon(Icons.event_available_rounded),
-            label: const Text('Book appointment'),
+              ],
+            ),
           ),
         ],
       ),
@@ -2594,6 +3076,35 @@ class _MapZoomControls extends StatelessWidget {
   }
 }
 
+class _MapSelectedBadge extends StatelessWidget {
+  const _MapSelectedBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: _donorDeepRed.withValues(alpha: 0.24),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: const Padding(
+        padding: EdgeInsets.all(2),
+        child: Icon(
+          Icons.check_circle_rounded,
+          color: tealAccent,
+          size: 16,
+        ),
+      ),
+    );
+  }
+}
+
 class _MapLegend extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -2605,6 +3116,30 @@ class _MapLegend extends StatelessWidget {
           _LegendItem(color: primaryColor, label: 'Critical'),
           _LegendItem(color: orangeAccent, label: 'Low'),
           _LegendItem(color: Color(0xFFF59E0B), label: 'Medium'),
+          _LegendItem(color: tealAccent, label: 'Good'),
+        ],
+      ),
+    );
+  }
+}
+
+class _MiniLegendRow extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: _donorRose,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _donorBorder),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _LegendItem(color: primaryColor, label: 'Critical'),
+          SizedBox(width: 10),
+          _LegendItem(color: orangeAccent, label: 'Low'),
+          SizedBox(width: 10),
           _LegendItem(color: tealAccent, label: 'Good'),
         ],
       ),

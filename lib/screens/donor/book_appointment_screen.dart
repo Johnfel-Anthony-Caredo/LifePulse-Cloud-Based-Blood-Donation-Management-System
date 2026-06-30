@@ -8,6 +8,12 @@ import '../../models/hospital.dart';
 import '../../services/appointment_service.dart';
 import '../../services/donor_service.dart';
 
+const _bookingInk = Color(0xFF22050B);
+const _bookingDeepRed = Color(0xFF7A001D);
+const _bookingRose = Color(0xFFFFEEF1);
+const _bookingBorder = Color(0xFFFFCED8);
+const _bookingMuted = Color(0xFF754352);
+
 class BookAppointmentScreen extends StatefulWidget {
   const BookAppointmentScreen({super.key, required this.hospital});
 
@@ -129,12 +135,35 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
 
     return Theme(
       data: Theme.of(context).copyWith(
-        scaffoldBackgroundColor: const Color(0xFFFFF7F7),
+        scaffoldBackgroundColor: _bookingRose,
+        colorScheme: const ColorScheme.light(
+          primary: primaryColor,
+          onPrimary: Colors.white,
+          secondary: tealAccent,
+          surface: Colors.white,
+          onSurface: _bookingInk,
+        ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
-          foregroundColor: Color(0xFF111827),
+          foregroundColor: _bookingInk,
           elevation: 0,
           centerTitle: false,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: _bookingBorder),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: _bookingBorder),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: primaryColor, width: 1.5),
+          ),
         ),
       ),
       child: Scaffold(
@@ -381,13 +410,17 @@ class _HospitalBookingHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: primaryColor,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_bookingDeepRed, primaryColor, Color(0xFFFF3B65)],
+        ),
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withValues(alpha: 0.18),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: primaryColor.withValues(alpha: 0.24),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -425,7 +458,7 @@ class _HospitalBookingHeader extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       hospital.address,
-                      style: const TextStyle(color: Color(0xFFFFE4E4)),
+                      style: const TextStyle(color: Color(0xFFFFDDE4)),
                     ),
                   ],
                 ),
@@ -508,7 +541,7 @@ class _DateSelector extends StatelessWidget {
                     DateFormat('MMM d').format(date),
                     style: TextStyle(
                       fontSize: 12,
-                      color: isSelected ? Colors.white70 : grayColor,
+                      color: isSelected ? Colors.white70 : _bookingMuted,
                     ),
                   ),
                 ],
@@ -557,7 +590,14 @@ class _BookingBottomBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFFFE4E4))),
+        border: Border(top: BorderSide(color: _bookingBorder)),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x1A7A001D),
+            blurRadius: 20,
+            offset: Offset(0, -8),
+          ),
+        ],
       ),
       child: SafeArea(
         top: false,
@@ -622,14 +662,14 @@ class _BookingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFFFFBFB),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFFFE4E4)),
+        border: Border.all(color: _bookingBorder),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0D000000),
-            blurRadius: 12,
-            offset: Offset(0, 4),
+            color: Color(0x147A001D),
+            blurRadius: 18,
+            offset: Offset(0, 8),
           ),
         ],
       ),
